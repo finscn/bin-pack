@@ -3,32 +3,42 @@
 var GrowingPacker = require('./packer.growing.js');
 
 module.exports = function(items, options) {
-	options = options || {};
-	var packer = new GrowingPacker();
-	var inPlace = options.inPlace || false;
+    options = options || {};
+    var packer = new GrowingPacker();
+    var inPlace = options.inPlace || false;
 
-	// Clone the items.
-	var newItems = items.map(function(item) { return inPlace ? item : { width: item.width, height: item.height, item: item }; });
+    // Clone the items.
+    var newItems = items.map(function(item) {
+        return inPlace ? item : {
+            w: item.w,
+            h: item.h,
+            item: item
+        };
+    });
 
-	newItems = newItems.sort(function(a, b) {
-		// TODO: check that each actually HAS a width and a height.
-		// Sort based on the size (area) of each block.
-		return (b.width * b.height) - (a.width * a.height);
-	});
+    newItems = newItems.sort(function(a, b) {
+        // TODO: check that each actually HAS a width and a height.
+        // Sort based on the size (area) of each block.
+        return (b.w * b.h) - (a.w * a.h);
+    });
 
-	packer.fit(newItems);
+    packer.fit(newItems);
 
-	var w = newItems.reduce(function(curr, item) { return Math.max(curr, item.x + item.width); }, 0);
-	var h = newItems.reduce(function(curr, item) { return Math.max(curr, item.y + item.height); }, 0);
+    var w = newItems.reduce(function(curr, item) {
+        return Math.max(curr, item.x + item.w);
+    }, 0);
+    var h = newItems.reduce(function(curr, item) {
+        return Math.max(curr, item.y + item.h);
+    }, 0);
 
-	var ret = {
-		width: w,
-		height: h
-	};
+    var ret = {
+        w: w,
+        h: h
+    };
 
-	if (!inPlace) {
-		ret.items = newItems;
-	}
+    if (!inPlace) {
+        ret.items = newItems;
+    }
 
-	return ret;
+    return ret;
 };
